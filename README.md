@@ -1,10 +1,6 @@
 # Track Schematic
-A program which turns csv files into track svg files
-<br />
-The program is intended to be used with https://github.com/wtfstantheman/Network-Rail-ActiveMQ but can be used anywhere
-<br />
+A program which turns csv files into track svg files, intended to be used with https://github.com/wtfstantheman/Network-Rail-ActiveMQ but can be used anywhere. This version uses render engine 1.5.
 # Syntax
-<br />
 
 Command | Arguments | Example | Notes
 --- | --- | --- | ---
@@ -16,7 +12,7 @@ points | turnout=[left/right], face=[forwards/backwards] | points?turnout=right&
 half | turnout=[left/right], face=[forwards/backwards] | half?face=backwards&turnout=left | None
 across | turnout=[left/right], face=[forwards/backwards] | across?face=forwards&turnout=left | None
 platform | position=[top/bottom], text= | platform?position=bottom&text=1 | None
-<br />
+
 Multiple elements can be combined by using [] containing elements seporated by commas, for example
 
 ```
