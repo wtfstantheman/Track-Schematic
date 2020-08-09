@@ -179,27 +179,52 @@ public class Main {
 
                             formatElement(x, y, Paths.get(String.valueOf(svgFolder), "berth.svg").toString(), f, berthMap, doc, svgRoot);
                         } else if (uri.getPath().toLowerCase().equals("signal")) {
-                            if (query_pairs.containsKey("face") && query_pairs.containsKey("id") && query_pairs.containsKey("display")) {
+                            if (query_pairs.containsKey("style") && query_pairs.get("style").equals("dwaft")) {
+                                if (query_pairs.containsKey("face") && query_pairs.containsKey("id") && query_pairs.containsKey("display")) {
 
-                                Map<String, Object> signalMap = new LinkedHashMap<String, Object>();
+                                    Map<String, Object> signalMap = new LinkedHashMap<String, Object>();
 
-                                Map<String, String> signalDisplay = new LinkedHashMap<String, String>();
-                                signalDisplay.put(":key", "signalDisplay");
-                                signalDisplay.put(":value", query_pairs.get("display"));
-                                signalMap.put(":signalDisplay", signalDisplay);
+                                    Map<String, String> signalDisplay = new LinkedHashMap<String, String>();
+                                    signalDisplay.put(":key", "signalDisplay");
+                                    signalDisplay.put(":value", query_pairs.get("display"));
+                                    signalMap.put(":signalDisplay", signalDisplay);
 
-                                Map<String, String> signalAspect = new LinkedHashMap<String, String>();
-                                signalAspect.put(":key", "signalAspect");
-                                signalAspect.put("id", query_pairs.get("id"));
-                                signalMap.put(":signalAspect", signalAspect);
+                                    Map<String, String> signalAspect = new LinkedHashMap<String, String>();
+                                    signalAspect.put(":key", "signalAspect");
+                                    signalAspect.put("id", query_pairs.get("id"));
+                                    signalMap.put(":signalAspect", signalAspect);
 
-                                //signalMap.put(":signalDisplay", "signalDisplay?value=" + query_pairs.get("display"));
-                                //signalMap.put(":signalAspect", "signalAspect?id=" + query_pairs.get("id"));
+                                    //signalMap.put(":signalDisplay", "signalDisplay?value=" + query_pairs.get("display"));
+                                    //signalMap.put(":signalAspect", "signalAspect?id=" + query_pairs.get("id"));
 
-                                formatElement(x, y, Paths.get(String.valueOf(svgFolder), "signal-face-" + query_pairs.get("face") + ".svg").toString(), f, signalMap, doc, svgRoot);
+                                    formatElement(x, y, Paths.get(String.valueOf(svgFolder), "signal-dwaft-face-" + query_pairs.get("face") + ".svg").toString(), f, signalMap, doc, svgRoot);
 
+                                } else {
+                                    System.out.println("[uk.co.somestuff.NetworkRail.Diagram] Cannot create 'signal' element, inefficient parameters (" + String.valueOf(ii) + ", " + String.valueOf(i) + ")");
+                                }
                             } else {
-                                System.out.println("[uk.co.somestuff.NetworkRail.Diagram] Cannot create 'signal' element, inefficient parameters (" + String.valueOf(ii) + ", " + String.valueOf(i) + ")");
+                                if (query_pairs.containsKey("face") && query_pairs.containsKey("id") && query_pairs.containsKey("display")) {
+
+                                    Map<String, Object> signalMap = new LinkedHashMap<String, Object>();
+
+                                    Map<String, String> signalDisplay = new LinkedHashMap<String, String>();
+                                    signalDisplay.put(":key", "signalDisplay");
+                                    signalDisplay.put(":value", query_pairs.get("display"));
+                                    signalMap.put(":signalDisplay", signalDisplay);
+
+                                    Map<String, String> signalAspect = new LinkedHashMap<String, String>();
+                                    signalAspect.put(":key", "signalAspect");
+                                    signalAspect.put("id", query_pairs.get("id"));
+                                    signalMap.put(":signalAspect", signalAspect);
+
+                                    //signalMap.put(":signalDisplay", "signalDisplay?value=" + query_pairs.get("display"));
+                                    //signalMap.put(":signalAspect", "signalAspect?id=" + query_pairs.get("id"));
+
+                                    formatElement(x, y, Paths.get(String.valueOf(svgFolder), "signal-face-" + query_pairs.get("face") + ".svg").toString(), f, signalMap, doc, svgRoot);
+
+                                } else {
+                                    System.out.println("[uk.co.somestuff.NetworkRail.Diagram] Cannot create 'signal' element, inefficient parameters (" + String.valueOf(ii) + ", " + String.valueOf(i) + ")");
+                                }
                             }
                         } else if (uri.getPath().toLowerCase().equals("platform")) {
                             if (query_pairs.containsKey("text") && query_pairs.containsKey("position")) {
@@ -292,6 +317,8 @@ public class Main {
             } else if (s.getChildNodes().item(_i).getLocalName().equals("circle")) {
                 oldElement.setAttributeNS(null, "cx", oldElement.hasAttribute("cx") ? String.valueOf(Float.parseFloat(oldElement.getAttribute("cx")) + Integer.parseInt(x)) : x);
                 oldElement.setAttributeNS(null, "cy", oldElement.hasAttribute("cy") ? String.valueOf(Float.parseFloat(oldElement.getAttribute("cy")) + Integer.parseInt(y)) : y);
+            } else if (s.getChildNodes().item(_i).getLocalName().equals("path")) {
+                oldElement.setAttributeNS(null, "transform", "translate(" + x + ", " + y + ")");
             }
 
             oldElement.setAttributeNS(null, "topX", x);
