@@ -4,7 +4,7 @@ A program which turns csv files into track svg files, intended to be used with h
 
 Command | Arguments | Example | Notes
 --- | --- | --- | ---
-text | text=, style=, note= | text?text=To/From&style=font-style:italic;font-size:14px; | Style attribute is added to the css of the element. Note is set to true when you want the text to showup in the jump menu
+text | text=, style=, note= | text?text=To/From&style=font-style:italic;font-size:14px;&note=true | Style attribute is added to the css of the element. Note is set to true when you want the text to showup in the jump menu
 track | None | track | None
 signal | face=[backwards/forwards], id=, display= | signal?face=backwards&id=BXS4783&display=S4783 | Display is whats shown, while id is the elemts id
 berth | id= | berth?id=BX4783 | None
