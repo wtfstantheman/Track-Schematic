@@ -2,9 +2,12 @@ package uk.co.somestuff.NetworkRail.ActiveMQ.Diagram;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import netscape.javascript.JSObject;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.util.XMLResourceDescriptor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,7 +34,7 @@ public class Main {
     public static void main(String[] args) throws URISyntaxException, IOException, CsvException, TransformerException {
 
         if (args.length < 1) {
-            System.out.println("You need to supply a CSV file and the SVG asset folder in that order. example 'file.jar /home/stan/Documents/Book.csv /home/stan/Documents/svg/'");
+            System.out.println("You need to supply a CSV file and the SVG asset folder in that order. example 'file.jar /Book.csv /svgAssets/'");
             System.exit(0);
         }
 
@@ -55,6 +58,8 @@ public class Main {
         String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
         Document doc = impl.createDocument(svgNS, "svg", null);
         Element svgRoot = doc.getDocumentElement();
+
+        JSONArray loc = new JSONArray();
 
         /** Opens the CSV and reads all the lines **/
 
@@ -118,6 +123,9 @@ public class Main {
                             }
                         }
 
+                        String locN = "";
+                        String locX = "";
+
                         if (uri.getPath().equals("track")) {
                             if (ii >= 1) {
                                 if (false) {
@@ -138,9 +146,13 @@ public class Main {
                             }
                         } else if (uri.getPath().toLowerCase().equals("text")) {
                             if (query_pairs.containsKey("text")) {
+                                if (query_pairs.containsKey("note")) {
+                                    locN = query_pairs.get("text");
+                                    locX = x;
+                                }
                                 Map<String, Object> localMap = new LinkedHashMap<String, Object>();
                                 localMap.put(":value", query_pairs.get("text"));
-                                localMap.put("style", query_pairs.containsKey("style") ? query_pairs.get("style") : "");
+                                localMap.put("style", query_pairs.getOrDefault("style", ""));
                                 formatElement(x, y, Paths.get(String.valueOf(svgFolder), "text.svg").toString(), f, localMap, doc, svgRoot);
                             } else {
                                 System.out.println("[uk.co.somestuff.NetworkRail.Diagram] Cannot create 'text' element, inefficient parameters (" + String.valueOf(ii) + ", " + String.valueOf(i) + ")");
@@ -203,13 +215,18 @@ public class Main {
                                     System.out.println("[uk.co.somestuff.NetworkRail.Diagram] Cannot create 'signal' element, inefficient parameters (" + String.valueOf(ii) + ", " + String.valueOf(i) + ")");
                                 }
                             } else {
-                                if (query_pairs.containsKey("face") && query_pairs.containsKey("id") && query_pairs.containsKey("display")) {
+                                if (query_pairs.containsKey("face") && query_pairs.containsKey("id")) {
 
                                     Map<String, Object> signalMap = new LinkedHashMap<String, Object>();
 
                                     Map<String, String> signalDisplay = new LinkedHashMap<String, String>();
                                     signalDisplay.put(":key", "signalDisplay");
-                                    signalDisplay.put(":value", query_pairs.get("display"));
+
+                                    if (query_pairs.containsKey("display")) {
+                                        signalDisplay.put(":value", query_pairs.get("display"));
+                                    } else {
+                                        signalDisplay.put(":value", query_pairs.get("id"));
+                                    }
                                     signalMap.put(":signalDisplay", signalDisplay);
 
                                     Map<String, String> signalAspect = new LinkedHashMap<String, String>();
@@ -240,6 +257,9 @@ public class Main {
                                 System.out.println("[uk.co.somestuff.NetworkRail.Diagram] Cannot create 'platform' element, inefficient parameters (" + String.valueOf(ii) + ", " + String.valueOf(i) + ")");
                             }
                         }
+                        if (!locN.isEmpty()) {
+                            loc.put(new JSONObject().put("name", locN).put("x", locX));
+                        }
                     }
                 }
 
@@ -266,10 +286,20 @@ public class Main {
         Bwriter.write(xmlString);
         Bwriter.close();
 
+        JSONObject f = new JSONObject()
+                .put("$type", "NetworkRail.ActiveMQ.Support.MAPSupport")
+                .put("locations", loc);
+
+        Bwriter = new BufferedWriter(new FileWriter(originalCSV.getParent() + "/MAP.json"));
+        Bwriter.write(f.toString());
+        Bwriter.close();
+
         System.out.println("[uk.co.somestuff.NetworkRail.ActiveMQ.Diagram] Complete");
         System.out.println("[uk.co.somestuff.NetworkRail.ActiveMQ.Diagram] Saved at '" + originalCSV.getParent() + "/MAP.svg'");
+        System.out.println("[uk.co.somestuff.NetworkRail.ActiveMQ.Diagram] Saved at '" + originalCSV.getParent() + "/MAP.json'");
         if (Desktop.isDesktopSupported()) {
             Desktop.getDesktop().open(new File(originalCSV.getParent() + "/MAP.svg"));
+            Desktop.getDesktop().open(new File(originalCSV.getParent() + "/MAP.json"));
         }
 
     }
